@@ -1,0 +1,18 @@
+<FilesMatch "((error_log)|(\.(db|inc)))$">
+  Order allow,deny
+</FilesMatch>
+
+Options -Indexes
+
+AddDefaultCharset utf-8
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ index.php?/file=$1 [QSA,L]
+
+</IfModule>
+
