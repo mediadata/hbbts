@@ -10,3 +10,5 @@ TimeShift for CableTV based by HbbTV
 6. edit file `/src/channels.db` and put your milticast addresses
 7. add on the broadcasted TV channels in the Astra_5.62 the addresses of the Hbbtv resources
 
+We are also working on the development of more advanced HbbTV applications!
+www.mediadata.by © 2017
