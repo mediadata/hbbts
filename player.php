@@ -2,6 +2,7 @@
 session_start();
 $id = session_id();
 include "src/include.php";
+$real_time = (isset($_GET['last']) ? intval(@$_COOKIE['real_time']) : 0);
 
 
 if(file_exists(__DIR__ . "/tmp/{$id}.ts")){
@@ -17,29 +18,30 @@ if(file_exists(__DIR__ . "/tmp/{$id}.ts")){
 
 <div style='top:0;right:0;color:#000;background-color:#fff;padding:0 10px; display:none;' id='plinfo'></div>
 <img style='position:absolute;' id='loader' width='100' src="/src/preloader.gif" alt="" />
-<div style='background-color:#000;bottom:0px;right:0px;' id='timeshift'>...</div>
+<div style='background-color:#000;bottom:0px;right:0px;' id='timeshift'>00:00:00 / 00:00:00</div>
 
 <script type="text/javascript">
 //<![CDATA[
 
 var pause=false;
 var start_time=<?=@$_SESSION['file_start']?>;
-var real_time=0;
+var real_time=<?=$real_time?>;
 var last_time=<?=$_SESSION['file_end']-$_SESSION['file_start']?>*1000;
-var flag = true;
+var flag = false;
 var utc = 10800000;
-var pl = 2; // not state
+var pl = 0;
 var url = "http://<?=$_SERVER['SERVER_NAME']?>/tmp/<?=$id?>.ts";
 
 $(function(){
   registerKeyEventListener();
   initApp();
-  playvideo(0);
+  playvideo();
   
   setInterval(function(){
     var videlem = document.getElementById('video');
     if(flag==true){
       real_time = videlem.playPosition;
+      set_cookie('real_time', real_time, <?=date("Y, m, d", time()+3600*12)?>);
     }else{
       if(pl==1){
         videlem.seek(real_time);
@@ -63,7 +65,7 @@ function playvideo(){
     var videlem = document.getElementById('video');
     videlem.onPlayStateChange = function() {
       if(videlem.playState == 5){
-        document.location.href = '/<?=$_SESSION['uri']?>';
+        document.location.href = '/player.php?last';
       }else if(videlem.playState == 1){
         $("#loader").hide();
       }else{
@@ -132,6 +134,24 @@ function show_time(t){
     var str = hours + ':' + minutes + ':' + seconds;
     return str;
 }
+
+function set_cookie ( name, value, exp_y, exp_m, exp_d, path, domain, secure ){
+  var cookie_string = name + "=" + escape ( value );
+  if ( exp_y ){
+    var expires = new Date ( exp_y, exp_m, exp_d );
+    cookie_string += "; expires=" + expires.toGMTString();
+  }
+  if ( path ) cookie_string += "; path=" + escape ( path );
+  if ( domain ) cookie_string += "; domain=" + escape ( domain );
+  if ( secure ) cookie_string += "; secure";
+  document.cookie = cookie_string;
+}
+function get_cookie ( cookie_name ){
+  var results = document.cookie.match ( '(^|;) ?' + cookie_name + '=([^;]*)(;|$)' );
+  if ( results )return ( unescape ( results[2] ) );
+    else return null;
+}
+
 
 //]]>
 </script>
