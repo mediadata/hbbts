@@ -7,7 +7,12 @@ $real_time = (isset($_GET['last']) ? intval(@$_COOKIE['real_time']) : 0);
 
 if(file_exists(__DIR__ . "/tmp/{$id}.ts")){
 
-  $_SESSION['file_end'] = @filectime(__DIR__ . "/tmp/{$id}.ts");
+  $tt = @filectime(__DIR__ . "/tmp/{$id}.ts");
+  if($tt==$_SESSION['file_end']){
+    header("Location: /{$_SESSION['uri']}");
+    exit;
+  }
+  $_SESSION['file_end'] = $tt;
   echo _header();
 
 ?>
